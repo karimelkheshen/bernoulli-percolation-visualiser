@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+
+:root {
+    --screen-background-color: #f1f0f0;
+    --title-font-color: #3c6e71;
+    --canvas-background-color: #5c5c5c;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Fugaz One", sans-serif;
+    background-color: var(--screen-background-color);
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.left-half {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    text-align: center;
+    color: var(--title-font-color);
+    font-size: 2em;
+}
+
+.left-half h1 {
+    margin-bottom: 10px;
+}
+
+.input-label-container {
+    display: flex;
+    width: 70%;
+}
+
+#probability-value {
+    padding-left: 20px;
+    width: 40%;
+}
+
+#probability-slider {
+    -webkit-appearance: none;
+    /* Removes default styling on webkit browsers */
+    appearance: none;
+    /* Removes default styling on all browsers */
+    width: 60%;
+    height: 20px;
+    background: rgb(187, 187, 187);
+    outline: none;
+    /* Removes the outline when the slider is clicked */
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    /* Adds a transition effect when the value of the slider changes */
+    transition: opacity .2s;
+    /* Adds a transition effect when the value of the slider changes */
+}
+
+#probability-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    /* Removes default styling on webkit browsers */
+    appearance: none;
+    /* Removes default styling on all browsers */
+    width: 20px;
+    height: 20px;
+    background: var(--title-font-color);
+    cursor: pointer;
+    /* Changes the cursor to a pointer when hovered over the thumb */
+}
+
+
+.right-half {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#percolation-canvas {
+    width: 50vw;
+    height: 70vh;
+    border-radius: 10px;
+    background-color: var(--canvas-background-color);
+    margin: auto;
+}
+
+@media (max-width: 900px) {
+    h1 {
+        font-size: 1.7em;
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 726px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-half {
+        width: 100%;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .right-half {
+        width: 100%;
+        align-items: center;
+    }
+
+    #percolation-canvas {
+        width: 80%;
+        height: 60vh;
+    }
+}
+
+@media screen and (max-width: 306px) and (max-height: 333px) {
+    #percolation-canvas {
+        height: 40vh;
+    }
+
+    h1 {
+        font-size: 1em;
+    }
+}
