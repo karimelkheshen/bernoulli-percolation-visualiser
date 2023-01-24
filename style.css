@@ -50,31 +50,23 @@ h1 {
 
 #probability-slider {
     -webkit-appearance: none;
-    /* Removes default styling on webkit browsers */
     appearance: none;
-    /* Removes default styling on all browsers */
     width: 60%;
     height: 20px;
     background: rgb(187, 187, 187);
     outline: none;
-    /* Removes the outline when the slider is clicked */
     opacity: 0.7;
     -webkit-transition: .2s;
-    /* Adds a transition effect when the value of the slider changes */
     transition: opacity .2s;
-    /* Adds a transition effect when the value of the slider changes */
 }
 
 #probability-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    /* Removes default styling on webkit browsers */
     appearance: none;
-    /* Removes default styling on all browsers */
     width: 20px;
     height: 20px;
     background: var(--title-font-color);
     cursor: pointer;
-    /* Changes the cursor to a pointer when hovered over the thumb */
 }
 
 
@@ -100,7 +92,6 @@ h1 {
     }
 }
 
-/* Media query for smaller screens */
 @media (max-width: 726px) {
     h1 {
         font-size: 2em;
