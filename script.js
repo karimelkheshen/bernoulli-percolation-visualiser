@@ -1,102 +1,155 @@
-/*
-    ! Instead of the current way of doing things:
-        1- Given the data structure connected_sets_per_p
-        2- Get all possible unique connected set sizes in a Set data structure.
-        3- Convert (2) into a dictionary where the keys are the sizes and the values are the color assigned.
-        4- During the drawing to the canvas, get the color of a connected set using the data structure of (3)
-*/
-
-/*
-    ? Experiment with the dimensions of the canvas.
-    As chatGPT said, regardless of the current canvas size on the page, create a grid of a large enough
-    resolution such that the pixel size shrinks and the picture becomes a bit more sharp.
-    Ask chatGPT again for suggestions on making the image sharper and start trying them all.
-*/
-
-const percolation_color_palette = [
-    '#355070',
-    '#6d597a',
-    '#b56576',
-    '#e56b6f',
-    '#eaac8b'
+const PERCOLATION_COLOR_PALETTE = [
+    '#10002b',
+    '#240046',
+    '#3c096c',
+    '#5a189a',
+    '#7b2cbf',
+    '#9d4edd',
+    '#c77dff',
+    '#e0aaff'
 ]
 
 window.onload = function() {
-
+    
+    // Get canvas parameters
     const canvas = document.getElementById("percolation-canvas");
-    const ctx = canvas.getContext('2d', { willReadFrequently : true});
+    const canvasWidth = canvas.clientWidth;
+    const canvasHeight = canvas.clientHeight;
 
+    // Get and set 2D context 
+    const ctx = canvas.getContext('2d', { willReadFrequently : true });
     ctx.imageSmoothingEnabled = false;
 
-    const canvas_width = canvas.offsetWidth;
-    const canvas_height = canvas.offsetHeight;
+    // gather prob control elements & current p value + update control ui
+    const probabilityValue = document.getElementById("probability-value");
+    const probabilitySlider = document.getElementById("probability-slider");
+    let currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
+    probabilityValue.innerHTML = `<span class="letterP">P</span>: ${currentProbability}`;
 
-    const probability_value = document.getElementById("probability-value");
-    const probability_slider = document.getElementById("probability-slider");
+    // generate grid and get connected components for current p
+    const grid = generateRandomGrid(canvasHeight, canvasWidth);
+    const currentComponents = getConnectedComponents(grid, currentProbability);
 
-    let current_probability = probability_slider.value;
-
-    probability_value.innerHTML = `p: ${current_probability}`
-    probability_slider.oninput = function () {
-        current_probability = probability_slider.value;
-        probability_value.innerHTML = `p: ${current_probability}`;
-        draw_connected_sets(connected_sets_per_p[current_probability], ctx, canvas_width, canvas_height);
+    // generate list to be indexed when choosing color for component drawing
+    const colorIndex = [];
+    const numIndexes = canvasHeight * canvasWidth;
+    for (let i = 0; i < numIndexes; i++) {
+        const randomColor = generateRandomColorFromPalette();
+        colorIndex.push(randomColor);
     }
 
-    const grid = generate_random_grid(canvas_height, canvas_width);
-    const connected_sets_per_p_uncolored = get_connected_sets_per_p(grid);
-    const connected_sets_per_p = assign_colors_to_sets(connected_sets_per_p_uncolored);
+    // create cache and pre-store some frames
+    cachedComponents = {};
+    cachedComponents[currentProbability] = currentComponents;
+    for (let i = 45; i <= 80; i++) {
+        const prob = (i / 100).toFixed(2);
+        cachedComponents[prob] = getConnectedComponents(grid, prob);
+    }
 
-    draw_connected_sets(connected_sets_per_p[current_probability], ctx, canvas_width, canvas_height);
+    drawComponentsToCanvas(currentComponents, colorIndex, ctx, canvasHeight, canvasWidth);
+
+    probabilitySlider.oninput = function () {
+        
+        // reset control ui and grab new value of p
+        probabilityValue.innerHTML = `<span class="letterP">P</span>: ${currentProbability}`;
+        currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
+        
+        // draw current components and store component list if not already cached
+        if (currentProbability in cachedComponents) {
+            drawComponentsToCanvas(cachedComponents[currentProbability], colorIndex, ctx, canvasHeight, canvasWidth);
+        } else {
+            const componentList = getConnectedComponents(grid, currentProbability);
+            drawComponentsToCanvas(componentList, colorIndex, ctx, canvasHeight, canvasWidth);
+            cachedComponents[currentProbability] = componentList;
+        }
+
+    }
+
 }
 
 
-function draw_connected_sets(connected_sets, ctx, canvas_width, canvas_height) {
-    const imgData = ctx.getImageData(0, 0, canvas_width, canvas_height);
-    for (let i = 0; i < connected_sets.length; i++) {
-        for (let j = 0; j < connected_sets[i].set.length; j++) {
-            const color = connected_sets[i].color;
-            const index = (connected_sets[i].set[j][1] * canvas_width + connected_sets[i].set[j][0]) * 4;
-            imgData.data[index + 0] = color.r;
-            imgData.data[index + 1] = color.g;
-            imgData.data[index + 2] = color.b;
-            imgData.data[index + 3] = 255;
+/* Generates a 2D grid of random floating point values between 0.0 and 1.0 with 2 decimal precision. */
+function generateRandomGrid(n, m) {
+    let grid = [];
+    for (let i = 0; i < n; i++) {
+        let row = [];
+        for (let j = 0; j < m; j++) {
+            row.push(parseFloat((Math.random()).toFixed(2)));
+        }
+        grid.push(row);
+    }
+    return grid;
+}
+
+
+/*  Returns a list of connected components based on a threshold value p, where each component is a list of adjacent coordinates with values <= p. */
+function getConnectedComponents(grid, prob) {
+    let visited = new Array(grid.length).fill().map(() => new Array(grid[0].length).fill(false));
+    const gridWidth = grid[0].length;
+    let sets = [];
+
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[0].length; j++) {
+            if (visited[i][j] === false && grid[i][j] <= prob) {
+                let currComponent = [[i, j]];
+                visited[i][j] = true;
+                currComponent = iterativeDFS(grid, visited, i, j, currComponent, prob);
+                currComponentIndexed = currComponent.map(coord => coordToIndex(coord[0], coord[1], gridWidth));
+                currComponentIndexed.sort((a, b) => a - b);
+                sets.push(currComponentIndexed);
+            }
         }
     }
-    ctx.putImageData(imgData, 0, 0);
+    return sets;
 }
 
 
-function assign_colors_to_sets(connected_sets_per_p) {
-    let res = {};
+/*  getConnectedComponents() helper function / Returns all connected coordinates to the input coordinate [i, j] including itself. */
+function iterativeDFS(grid, visited, i, j, currComponent, prob) {
+    let stack = [[i, j]];
+    let row = [-1, 0, 1, 0];
+    let col = [0, 1, 0, -1];
 
-    const max_num_connected_sets = Math.max(...Object.values(connected_sets_per_p).map(list => list.length));
-    const color_code_list = Array.from({ length: max_num_connected_sets }, get_random_color_from_pallette);
-    
-    Object.keys(connected_sets_per_p).forEach(prob => {
-        new_value = [];
-        let sets_to_sort = connected_sets_per_p[prob];
-        sets_to_sort.sort(function (a, b) {
-            return b.length - a.length;
-        });
-        for (let i=0 ; i<sets_to_sort.length ; i++) {
-            new_value.push({
-                color: color_code_list[i],
-                set: sets_to_sort[i]
-            })
+    while (stack.length > 0) {
+        let [x, y] = stack.pop();
+        for (let k = 0; k < 4; k++) {
+            let newX = x + row[k];
+            let newY = y + col[k];
+            if (isSafe(grid, visited, newX, newY, prob)) {
+                visited[newX][newY] = true;
+                currComponent.push([newX, newY]);
+                stack.push([newX, newY]);
+            }
         }
-        res[prob] = new_value;
-    });
-
-    return res;
+    }
+    return currComponent;
 }
 
 
-function get_random_color_from_pallette() {
-    const randomIndex = Math.floor(Math.random() * percolation_color_palette.length)
-    const randomColor = percolation_color_palette[randomIndex].slice(1)
+/*  iterativeDFS() helper / "Checks if grid cell is within bounds and unvisited before DFS. */
+function isSafe(grid, visited, x, y, prob) {
+    return (x >= 0 && x < grid.length && y >= 0 && y < grid[0].length && grid[x][y] <= prob && !visited[x][y]);
+}
 
-    // To make the color darker or lighter
+
+function coordToIndex(x, y, width) {
+    return y * width + x;
+}
+
+
+function indexToCoord(index, width) {
+    return [
+        index % width,
+        Math.floor(index / width)
+    ];
+}
+
+
+/* Generates a random variation (lighter/darker version) of one of the colors in a set. (returns {r:,g:,b:}) */
+function generateRandomColorFromPalette() {
+    const randomIndex = Math.floor(Math.random() * PERCOLATION_COLOR_PALETTE.length)
+    const randomColor = PERCOLATION_COLOR_PALETTE[randomIndex].slice(1)
+
     const luminance = (0.2126 * parseInt(randomColor.slice(0, 2), 16) + 0.7152 * parseInt(randomColor.slice(2, 4), 16) + 0.0722 * parseInt(randomColor.slice(4, 6), 16)) / 255
     let r, g, b;
     if (luminance > 0.5) {
@@ -116,75 +169,43 @@ function get_random_color_from_pallette() {
 }
 
 
-function* range(start, end, step) {
-    while (start < end) {
-        yield start;
-        start += step;
-    }
+// (returns {r:,g:,b:})
+function generateRandomColor() {
+    return {
+        r: Math.floor(Math.random() * 256),
+        g: Math.floor(Math.random() * 256), 
+        b: Math.floor(Math.random() * 256)
+    };
 }
 
 
-function get_connected_sets_per_p(grid) {
-    res = {}
-    let probs = Array.from(range(0, 1.01, 0.01)).map(num => +num.toFixed(2));
-    probs.forEach(prob => {
-        res[prob] = get_connected_sets(grid, prob);
-    })
-    return res;
-}
+/* Sets up the frame of connected components with their assigned colors related to the current value of P, and draws it to the canvas. */
+function drawComponentsToCanvas(componentList, colorIndex, ctx, canvasHeight, canvasWidth) {    
+    
+    const imgData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
 
-
-function get_connected_sets(grid, p) {
-    let visited = new Array(grid.length).fill().map(() => new Array(grid[0].length).fill(false));
-    let sets = [];
-
-    for (let i = 0; i < grid.length; i++) {
-        for (let j = 0; j < grid[0].length; j++) {
-            if (visited[i][j] === false && grid[i][j] <= p) {
-                let set = [[i, j]];
-                visited[i][j] = true;
-                sets.push(iterative_dfs(grid, visited, i, j, set, p));
-            }
+    for (let i = 0; i < componentList.length; i++) {
+        const currComponent = componentList[i];
+        const currMinIndex = currComponent[0];
+        
+        const currColor = colorIndex[currMinIndex];
+        if (currColor === undefined) {
+            continue;
+        }
+        
+        for (let j = 0; j < currComponent.length; j++) {
+            const currCoord = indexToCoord(currComponent[j], canvasWidth);
+            const x = currCoord[0];
+            const y = currCoord[1];
+    
+            const index = (y * canvasWidth + x) * 4;
+            imgData.data[index + 0] = currColor.r;
+            imgData.data[index + 1] = currColor.g;
+            imgData.data[index + 2] = currColor.b;
+            imgData.data[index + 3] = 255;
         }
     }
-    return sets;
+    
+    ctx.putImageData(imgData, 0, 0);
 }
 
-
-function iterative_dfs(grid, visited, i, j, set, p) {
-    let stack = [[i, j]];
-    let row = [-1, 0, 1, 0];
-    let col = [0, 1, 0, -1];
-
-    while (stack.length > 0) {
-        let [x, y] = stack.pop();
-        for (let k = 0; k < 4; k++) {
-            let newX = x + row[k];
-            let newY = y + col[k];
-            if (is_safe(grid, visited, newX, newY, p)) {
-                visited[newX][newY] = true;
-                set.push([newX, newY]);
-                stack.push([newX, newY]);
-            }
-        }
-    }
-    return set;
-}
-
-
-function is_safe(grid, visited, x, y, p) {
-    return (x >= 0 && x < grid.length && y >= 0 && y < grid[0].length && grid[x][y] <= p && !visited[x][y]);
-}
-
-
-function generate_random_grid(n, m) {
-    let grid = [];
-    for (let i = 0; i < n; i++) {
-        let row = [];
-        for (let j = 0; j < m; j++) {
-            row.push(parseFloat((Math.random()).toFixed(2)));
-        }
-        grid.push(row);
-    }
-    return grid;
-}

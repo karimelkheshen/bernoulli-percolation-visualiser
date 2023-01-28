@@ -11,7 +11,7 @@
 }
 
 body {
-    font-family: "Fugaz One", sans-serif;
+    font-family: "Fugaz One", Courier, sans-serif;
     background-color: var(--screen-background-color);
 }
 
@@ -46,6 +46,11 @@ h1 {
 #probability-value {
     padding-left: 20px;
     width: 40%;
+}
+
+.letterP {
+    color: darkred;
+    font-size: 1.2em;
 }
 
 #probability-slider {
@@ -85,6 +90,8 @@ h1 {
     background-color: var(--canvas-background-color);
     margin: auto;
 }
+
+/* RESPONSIVENESS */
 
 @media (max-width: 900px) {
     h1 {
