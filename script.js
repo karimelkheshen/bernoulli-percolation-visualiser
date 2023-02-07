@@ -1,4 +1,6 @@
 const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd']
+const CACHING_STEP = 2;
+
 
 window.onload = function() {
 
@@ -6,14 +8,14 @@ window.onload = function() {
     const probabilityValue = document.getElementById("probability-value");
     const probabilitySlider = document.getElementById("probability-slider");
     let currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
-    probabilityValue.innerHTML = `<span class="letterP">Prob</span>: ${currentProbability}`;
+    probabilityValue.innerHTML = `Prob: ${currentProbability}`;
 
     // Get canvas parameters
     const canvas = document.getElementById("percolation-canvas");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    //console.log(`Canvas dimensions: ${canvas.width} x ${canvas.height}`);
+    //console.log(`Canvas dimensions: rows:${canvas.height} x cols:${canvas.width}`);
 
     // Get and set 2D context
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -35,7 +37,7 @@ window.onload = function() {
     // create cache and pre-store some frames
     cachedComponents = {};
     cachedComponents[currentProbability] = currentComponents;
-    for (let i = 0; i <= 100; i++) {
+    for (let i = 0; i <= 100; i += CACHING_STEP) {
         const prob = (i / 100).toFixed(2);
         cachedComponents[prob] = getConnectedComponents(grid, prob, canvas.width, canvas.height);
     }
@@ -45,7 +47,7 @@ window.onload = function() {
     probabilitySlider.oninput = function () {
 
         // reset control ui and grab new value of p
-        probabilityValue.innerHTML = `<span class="letterP">Prob</span>: ${currentProbability}`;
+        probabilityValue.innerHTML = `Prob: ${currentProbability}`;
         currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
 
         // draw current components and cache new component list
@@ -56,7 +58,6 @@ window.onload = function() {
             drawComponentsToCanvas(componentList, colorIndex, ctx, canvas.height, canvas.width);
             cachedComponents[currentProbability] = componentList;
         }
-
     }
 
 }
@@ -85,12 +86,15 @@ function getConnectedComponents(grid, prob, canvasWidth, canvasHeight) {
     for (let i = 0; i < canvasHeight; i++) {
         for (let j = 0; j < canvasWidth; j++) {
             if (visited[i][j] === false && grid[i][j] <= prob) {
+                
                 let currComponent = [[i, j]];
                 visited[i][j] = true;
                 currComponent = iterativeDFS(grid, visited, i, j, currComponent, prob);
-                currComponentIndexed = currComponent.map(coord => coordToIndex(coord[0], coord[1], canvasWidth));
-                currComponentIndexed.sort((a, b) => a - b);
-                sets.push(currComponentIndexed);
+                
+                currComponentIndexes = currComponent.map(coord => coordToIndex(coord[0], coord[1], canvasWidth));
+                currComponentIndexes.sort((a, b) => a - b);
+                
+                sets.push(currComponentIndexes);
             }
         }
     }
@@ -144,19 +148,14 @@ function drawComponentsToCanvas(componentList, colorIndex, ctx, canvasHeight, ca
 
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    for (let i = 0; i < componentList.length; i++) {
-        const currComponent = componentList[i];
-        const currMinIndex = currComponent[0];
-        let currColor = colorIndex[currMinIndex];
+    componentList.forEach(component => {
+        ctx.fillStyle = colorIndex[component[0]];
 
-        for (let j = 0; j < currComponent.length; j++) {
-            const currCoord = indexToCoord(currComponent[j], canvasWidth);
-            const x = currCoord[0];
-            const y = currCoord[1];
+        for (let j = 0; j < component.length; j++) {
+            const currCoord = indexToCoord(component[j], canvasWidth);
 
-            ctx.fillStyle = currColor;
-            ctx.fillRect(x, y, 1, 1);
+            ctx.fillRect(currCoord[0], currCoord[1], 1, 1);
+            
         }
-    }
-
+    });
 }
