@@ -1,65 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fugaz+One');
+
 
 :root {
     --screen-background-color: #dddcdc;
-    --title-font-color: #3c6e71;
-    --canvas-background-color: #616161;
+    --main-font-color: #3c6e71;
+    --canvas-background-color: #605f5f;
+    --canvas-width: 40vw;
+    --canvas-height: 55vh;
+    --inter-link-distance: 8em;
 }
 
+
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
+
 body {
     font-family: "Fugaz One", Courier, sans-serif;
+    font-display: block;
     background-color: var(--screen-background-color);
 }
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-}
-
-.control-container {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
 
 h1 {
-    text-align: center;
-    color: var(--title-font-color);
+    color: var(--main-font-color);
     font-size: 2.5em;
-}
-
-.control-container h1 {
     margin-bottom: 0.5em;
+    margin-top: 0.5em;
 }
 
-.input-label-container {
-    display: flex;
-    width: 70%;
-}
 
-#probability-value {
-    padding-left: 1em;
-    width: 40%;
-}
-
-.letterP {
-    color: darkred;
+.nav-link {
+    color: var(--canvas-background-color);
     font-size: 1.2em;
+    cursor: pointer;
+    display: inline;
 }
+
+.nav-link:hover {
+    color: var(--main-font-color);
+    text-decoration: underline;
+}
+
+#source-code-link {
+    margin-right: var(--inter-link-distance);
+}
+
+#about-page-link {
+    margin-left: var(--inter-link-distance);
+}
+
+
+#percolation-canvas {
+    width: var(--canvas-width);
+    height: var(--canvas-height);
+    border-radius: 10px;
+    background-color: var(--canvas-background-color);
+    margin-top: 0.5em;
+}
+
 
 #probability-slider {
+    width: var(--canvas-width);
+    height: 20px;
+    margin-top: 1em;
+
     -webkit-appearance: none;
     appearance: none;
-    width: 60%;
-    height: 20px;
     background: rgb(187, 187, 187);
     outline: none;
     opacity: 0.7;
@@ -68,50 +78,15 @@ h1 {
 }
 
 #probability-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
     width: 20px;
     height: 20px;
-    background: var(--title-font-color);
+
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--main-font-color);
     cursor: pointer;
 }
 
-
-.canvas-container {
-    width: 60%;
-    height: 70%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#percolation-canvas {
-    width: 40vw;
-    height: 50vh;
-    border-radius: 10px;
-    background-color: var(--canvas-background-color);
-    /*margin: auto;*/
-}
-
-/* RESPONSIVENESS */
-
-/* Smart phones */
-@media (max-height: 920px) and (max-width: 450px) {
-    .control-container {
-        width: 100%;
-    }
-
-    h1 {
-        font-size: 2em;
-    }
-
-    .canvas-container {
-        width: 100%;
-        height: 50%;
-    }
-
-    #percolation-canvas {
-        width: 80%;
-        height: 60%;
-    }
+#probability-value {
+    display: block;
 }

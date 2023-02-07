@@ -1,5 +1,5 @@
 const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd']
-const CACHING_STEP = 2;
+const CACHING_STEP = 1;
 
 
 window.onload = function() {
@@ -18,7 +18,6 @@ window.onload = function() {
 
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-    //console.log(`Canvas dimensions: rows:${canvas.height} x cols:${canvas.width}`);
 
 
     const grid = generateRandomGrid(canvas.width, canvas.height);
@@ -164,7 +163,7 @@ function drawComponentsToCanvas(componentList, colorIndex, ctx, canvasHeight, ca
         for (let j = 0; j < component.length; j++) {
             const currCoord = indexToCoord(component[j], canvasWidth);
 
-            ctx.fillRect(currCoord[0], currCoord[1], 1, 1);
+            ctx.fillRect(currCoord[1], currCoord[0], 1, 1);
             
         }
     });
