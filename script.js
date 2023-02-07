@@ -4,64 +4,74 @@ const CACHING_STEP = 2;
 
 window.onload = function() {
 
-    // gather prob control elements & current p value + update control ui
     const probabilityValue = document.getElementById("probability-value");
     const probabilitySlider = document.getElementById("probability-slider");
+
+
     let currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
     probabilityValue.innerHTML = `Prob: ${currentProbability}`;
 
-    // Get canvas parameters
+
     const canvas = document.getElementById("percolation-canvas");
+    const ctx = canvas.getContext('2d');
+
+
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
-
     //console.log(`Canvas dimensions: rows:${canvas.height} x cols:${canvas.width}`);
 
-    // Get and set 2D context
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.imageSmoothingEnabled = false;
 
-    // generate grid and get connected components for current p
     const grid = generateRandomGrid(canvas.width, canvas.height);
-    const currentComponents = getConnectedComponents(grid, currentProbability, canvas.width, canvas.height);
-
-    // generate list to be indexed when choosing color for component drawing
-    const colorIndex = [];
-    const maxIndex = coordToIndex(canvas.height - 1, canvas.width - 1, canvas.width);
-    for (let i = 0; i < maxIndex; i++) {
-        const randIndex = Math.floor(Math.random() * COMPONENT_COLOR_PALETTE.length);
-        colorIndex.push(COMPONENT_COLOR_PALETTE[randIndex]);
-    }
 
 
-    // create cache and pre-store some frames
-    cachedComponents = {};
-    cachedComponents[currentProbability] = currentComponents;
-    for (let i = 0; i <= 100; i += CACHING_STEP) {
-        const prob = (i / 100).toFixed(2);
-        cachedComponents[prob] = getConnectedComponents(grid, prob, canvas.width, canvas.height);
-    }
+    let componentListCache = generateComponentListCache(grid, currentProbability, canvas);
 
-    drawComponentsToCanvas(currentComponents, colorIndex, ctx, canvas.height, canvas.width);
+
+    const colorIndex = generateColorIndex(canvas);
+    drawComponentsToCanvas(componentListCache[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
+
 
     probabilitySlider.oninput = function () {
 
-        // reset control ui and grab new value of p
         probabilityValue.innerHTML = `Prob: ${currentProbability}`;
         currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
 
-        // draw current components and cache new component list
-        if (currentProbability in cachedComponents) {
-            drawComponentsToCanvas(cachedComponents[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
-        } else {
+        if (currentProbability in componentListCache) {
+            drawComponentsToCanvas(componentListCache[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
+        }
+        else {
             const componentList = getConnectedComponents(grid, currentProbability, canvas.width, canvas.height);
             drawComponentsToCanvas(componentList, colorIndex, ctx, canvas.height, canvas.width);
-            cachedComponents[currentProbability] = componentList;
+            componentListCache[currentProbability] = componentList;
         }
     }
 
 }
 
+
+function generateComponentListCache(grid, currentProb, canvas) {
+    let componentListCache = {}
+    for (let i = 0; i <= 100; i += CACHING_STEP) {
+        const prob = (i / 100).toFixed(2);
+        componentListCache[prob] = getConnectedComponents(grid, prob, canvas.width, canvas.height);
+    }
+    if (! (currentProb in componentListCache)) {
+        componentListCache[currentProb] = getConnectedComponents(grid, currentProb, canvas.width, canvas.height);
+    }
+    return componentListCache;
+}
+
+
+/* Used to assign each grid 1d index a color before component coloring */
+function generateColorIndex(canvas) {
+    let colorIndex = [];
+    const maxIndex = coordToIndex(canvas.height - 1, canvas.width - 1, canvas.width);
+    for (let i = 0; i < maxIndex; i++) {
+        const randIndex = Math.floor(Math.random() * COMPONENT_COLOR_PALETTE.length);
+        colorIndex.push(COMPONENT_COLOR_PALETTE[randIndex]);
+    }
+    return colorIndex;
+}
 
 
 /* Generates a 2D grid of random floating point values between 0.0 and 1.0 with 2 decimal precision. */
