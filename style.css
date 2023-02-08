@@ -4,10 +4,15 @@
 :root {
     --screen-background-color: #dddcdc;
     --main-font-color: #3c6e71;
+    
+    --inter-link-distance: 8em;
+
     --canvas-background-color: #605f5f;
     --canvas-width: 40vw;
     --canvas-height: 55vh;
-    --inter-link-distance: 8em;
+
+    --progress-box-background: #ff7d00;
+    --progress-box-text: #ffecd1;
 }
 
 
@@ -89,4 +94,25 @@ h1 {
 
 #probability-value {
     display: block;
+}
+
+
+#progress-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 260px;
+    height: 25px;
+    
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    
+    border: 1px solid var(--progress-box-text);
+    border-radius: 10px;
+
+    color: var(--progress-box-text);
+    background-color: var(--progress-box-background);
 }

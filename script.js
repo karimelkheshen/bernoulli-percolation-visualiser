@@ -1,5 +1,4 @@
 const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd']
-const CACHING_STEP = 1;
 
 
 window.onload = function() {
@@ -23,11 +22,13 @@ window.onload = function() {
     const grid = generateRandomGrid(canvas.width, canvas.height);
 
 
-    let componentListCache = generateComponentListCache(grid, currentProbability, canvas);
-
-
+    let componentListCache = generateComponentListCache(grid, canvas);
     const colorIndex = generateColorIndex(canvas);
-    drawComponentsToCanvas(componentListCache[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
+
+
+    // draw first frame
+    const firstFrame = getConnectedComponents(grid, currentProbability, canvas.width, canvas.height);
+    drawComponentsToCanvas(firstFrame, colorIndex, ctx, canvas.height, canvas.width);
 
 
     probabilitySlider.oninput = function () {
@@ -48,15 +49,29 @@ window.onload = function() {
 }
 
 
-function generateComponentListCache(grid, currentProb, canvas) {
-    let componentListCache = {}
-    for (let i = 0; i <= 100; i += CACHING_STEP) {
+function generateComponentListCache(grid, canvas) {
+    const progressBox = document.getElementById("progress-box");
+    //const progressText = document.getElementById("progress-text");
+    progressBox.style.display = "block";
+
+    let i = 0;
+    let componentListCache = {};
+
+    function updateProgress() {
+        //progressText.innerHTML = `Loading percolation frames: ${i}%`;
+        progressBox.innerHTML = `LOADING SIMULATION ${i}%`;
         const prob = (i / 100).toFixed(2);
         componentListCache[prob] = getConnectedComponents(grid, prob, canvas.width, canvas.height);
+
+        if (i < 100) {
+            i++;
+            requestAnimationFrame(updateProgress);
+        } else {
+            progressBox.style.display = "none";
+        }
     }
-    if (! (currentProb in componentListCache)) {
-        componentListCache[currentProb] = getConnectedComponents(grid, currentProb, canvas.width, canvas.height);
-    }
+
+    requestAnimationFrame(updateProgress);
     return componentListCache;
 }
 
