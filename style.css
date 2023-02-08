@@ -4,12 +4,8 @@
 :root {
     --screen-background-color: #dddcdc;
     --main-font-color: #3c6e71;
-    
-    --inter-link-distance: 8em;
 
     --canvas-background-color: #605f5f;
-    --canvas-width: 40vw;
-    --canvas-height: 55vh;
 
     --progress-box-background: #ff7d00;
     --progress-box-text: #ffecd1;
@@ -50,18 +46,8 @@ h1 {
     text-decoration: underline;
 }
 
-#source-code-link {
-    margin-right: var(--inter-link-distance);
-}
-
-#about-page-link {
-    margin-left: var(--inter-link-distance);
-}
-
 
 #percolation-canvas {
-    width: var(--canvas-width);
-    height: var(--canvas-height);
     border-radius: 10px;
     background-color: var(--canvas-background-color);
     margin-top: 0.5em;
@@ -69,7 +55,6 @@ h1 {
 
 
 #probability-slider {
-    width: var(--canvas-width);
     height: 20px;
     margin-top: 1em;
 
@@ -115,4 +100,68 @@ h1 {
 
     color: var(--progress-box-text);
     background-color: var(--progress-box-background);
+}
+
+
+
+/* general portrait phones */
+@media only screen and (min-width: 320px) {
+    #percolation-canvas {
+        width: 90vw;
+        height: 45vh;
+    }
+
+    #source-code-link {
+        margin-right: 5em;
+    }
+
+    #about-page-link {
+        margin-left: 5em;
+    }
+
+    #probability-slider {
+        width: 90vw;
+    }
+}
+
+
+/* general portrait tablets */
+@media only screen and (min-width: 600px) {
+    #percolation-canvas {
+        width: 65vw;
+        height: 50vh;
+    }
+
+    #source-code-link {
+        margin-right: 9em;
+    }
+
+    #about-page-link {
+        margin-left: 9em;
+    }
+
+    #probability-slider {
+        width: 65vw;
+    }
+}
+
+
+/* General desktop */
+@media only screen and (min-width: 980px) {
+    #percolation-canvas {
+        width: 40vw;
+        height: 50vh;
+    }
+
+    #source-code-link {
+        margin-right: 8em;
+    }
+
+    #about-page-link {
+        margin-left: 8em;
+    }
+
+    #probability-slider {
+        width: 40vw;
+    }
 }
