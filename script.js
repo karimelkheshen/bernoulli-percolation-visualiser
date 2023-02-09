@@ -64,7 +64,6 @@ function generateAndStoreColorIndex(canvas) {
         const randIndex = Math.floor(Math.random() * COMPONENT_COLOR_PALETTE.length);
         colorIndex.push(COMPONENT_COLOR_PALETTE[randIndex]);
     }
-    localStorage.setItem(COLOR_INDEX_STORAGE_KEYNAME, JSON.stringify(colorIndex));
     return colorIndex;
 }
 

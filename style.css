@@ -110,6 +110,7 @@ h1 {
     width: 50vw;
     margin: 0 auto;
     margin-top: 2em;
+    margin-bottom: 2em;
     padding: 1em;
 }
 
@@ -191,5 +192,35 @@ h2 {
 
     #probability-slider {
         width: 40vw;
+    }
+}
+
+
+/* High res desktops */
+@media only screen and (min-width: 1280px) {
+    h1 {
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    #percolation-canvas {
+        width: 35vw;
+        height: 45vh;
+    }
+
+    #source-code-link {
+        margin-right: 10em;
+    }
+
+    #about-page-link {
+        margin-left: 10em;
+    }
+
+    #probability-slider {
+        width: 35vw;
+    }
+
+    #about-card {
+        width: 50vw;
     }
 }
