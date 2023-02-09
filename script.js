@@ -1,64 +1,44 @@
-const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd']
+const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd'];
+const COMPONENT_LIST_STORAGE_KEYNAME = 'cachedComponentList';
+const COLOR_INDEX_STORAGE_KEYNAME = 'colorIndex';
 
 
 window.onload = function() {
-
     const probabilityValue = document.getElementById("probability-value");
     const probabilitySlider = document.getElementById("probability-slider");
-
 
     let currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
     probabilityValue.innerHTML = `Prob: ${currentProbability}`;
 
-
     const canvas = document.getElementById("percolation-canvas");
     const ctx = canvas.getContext('2d');
-
 
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-
     const grid = generateRandomGrid(canvas.width, canvas.height);
+    const componentListCache = generateAndStoreComponentListCache(grid, canvas);
+    const colorIndex = generateAndStoreColorIndex(canvas);
 
-
-    let componentListCache = generateComponentListCache(grid, canvas);
-    const colorIndex = generateColorIndex(canvas);
-
-
-    // draw first frame
     const firstFrame = getConnectedComponents(grid, currentProbability, canvas.width, canvas.height);
     drawComponentsToCanvas(firstFrame, colorIndex, ctx, canvas.height, canvas.width);
 
-
     probabilitySlider.oninput = function () {
-
         probabilityValue.innerHTML = `Prob: ${currentProbability}`;
         currentProbability = parseFloat(probabilitySlider.value).toFixed(2);
-
-        if (currentProbability in componentListCache) {
-            drawComponentsToCanvas(componentListCache[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
-        }
-        else {
-            const componentList = getConnectedComponents(grid, currentProbability, canvas.width, canvas.height);
-            drawComponentsToCanvas(componentList, colorIndex, ctx, canvas.height, canvas.width);
-            componentListCache[currentProbability] = componentList;
-        }
+        drawComponentsToCanvas(componentListCache[currentProbability], colorIndex, ctx, canvas.height, canvas.width);
     }
-
 }
 
 
-function generateComponentListCache(grid, canvas) {
+function generateAndStoreComponentListCache(grid, canvas) {
     const progressBox = document.getElementById("progress-box");
-    //const progressText = document.getElementById("progress-text");
     progressBox.style.display = "block";
 
     let i = 0;
     let componentListCache = {};
 
     function updateProgress() {
-        //progressText.innerHTML = `Loading percolation frames: ${i}%`;
         progressBox.innerHTML = `LOADING SIMULATION ${i}%`;
         const prob = (i / 100).toFixed(2);
         componentListCache[prob] = getConnectedComponents(grid, prob, canvas.width, canvas.height);
@@ -77,13 +57,14 @@ function generateComponentListCache(grid, canvas) {
 
 
 /* Used to assign each grid 1d index a color before component coloring */
-function generateColorIndex(canvas) {
+function generateAndStoreColorIndex(canvas) {
     let colorIndex = [];
     const maxIndex = coordToIndex(canvas.height - 1, canvas.width - 1, canvas.width);
     for (let i = 0; i < maxIndex; i++) {
         const randIndex = Math.floor(Math.random() * COMPONENT_COLOR_PALETTE.length);
         colorIndex.push(COMPONENT_COLOR_PALETTE[randIndex]);
     }
+    localStorage.setItem(COLOR_INDEX_STORAGE_KEYNAME, JSON.stringify(colorIndex));
     return colorIndex;
 }
 
