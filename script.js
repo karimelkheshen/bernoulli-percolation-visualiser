@@ -1,6 +1,4 @@
 const COMPONENT_COLOR_PALETTE = ['#0d1b2a', '#1b263b', '#415a77', '#778da9', '#e0e1dd'];
-const COMPONENT_LIST_STORAGE_KEYNAME = 'cachedComponentList';
-const COLOR_INDEX_STORAGE_KEYNAME = 'colorIndex';
 
 
 window.onload = function() {
