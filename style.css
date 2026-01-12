@@ -1,14 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Fugaz+One');
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("fonts/JetBrainsMono-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 :root {
     --screen-background-color: #dddcdc;
     --main-font-color: #3c6e71;
 
     --canvas-background-color: #605f5f;
-
-    --progress-box-background: #ff7d00;
-    --progress-box-text: #ffecd1;
 }
 
 
@@ -20,7 +46,7 @@
 
 
 body {
-    font-family: "Fugaz One", Courier, sans-serif;
+    font-family: "JetBrains Mono", monospace;
     font-display: block;
     background-color: var(--screen-background-color);
 }
@@ -28,11 +54,19 @@ body {
 
 h1 {
     color: var(--main-font-color);
+    font-weight: bold;
     font-size: 2.5em;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.1em;
     margin-top: 0.5em;
 }
 
+#subtitle {
+    color: var(--canvas-background-color);
+    font-size: 1em;
+    max-width: 720px;
+    margin: 0 auto 0.6em auto;
+    line-height: 1.4;
+}
 
 .nav-link {
     color: var(--canvas-background-color);
@@ -65,6 +99,7 @@ h1 {
     opacity: 0.7;
     -webkit-transition: .2s;
     transition: opacity .2s;
+    border-radius: 10px;
 }
 
 #probability-slider::-webkit-slider-thumb {
@@ -79,27 +114,6 @@ h1 {
 
 #probability-value {
     display: block;
-}
-
-
-#progress-box {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    width: 260px;
-    height: 25px;
-    
-    font-size: 16px;
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
-    
-    border: 1px solid var(--progress-box-text);
-    border-radius: 10px;
-
-    color: var(--progress-box-text);
-    background-color: var(--progress-box-background);
 }
 
 
@@ -132,10 +146,6 @@ h2 {
         height: 45vh;
     }
 
-    #source-code-link {
-        margin-right: 5em;
-    }
-
     #about-page-link {
         margin-left: 5em;
     }
@@ -157,10 +167,6 @@ h2 {
         height: 50vh;
     }
 
-    #source-code-link {
-        margin-right: 9em;
-    }
-
     #about-page-link {
         margin-left: 9em;
     }
@@ -180,10 +186,6 @@ h2 {
     #percolation-canvas {
         width: 40vw;
         height: 50vh;
-    }
-
-    #source-code-link {
-        margin-right: 8em;
     }
 
     #about-page-link {
@@ -208,10 +210,6 @@ h2 {
         height: 45vh;
     }
 
-    #source-code-link {
-        margin-right: 10em;
-    }
-
     #about-page-link {
         margin-left: 10em;
     }
@@ -223,4 +221,8 @@ h2 {
     #about-card {
         width: 50vw;
     }
+}
+
+#play-pause-btn {
+    min-width: 90px;
 }
